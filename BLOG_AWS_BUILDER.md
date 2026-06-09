@@ -405,12 +405,4 @@ For Lambda deployment, package the project with dependencies and configure the S
 
 ---
 
-_Sweta Jha is a Senior Data Scientist and AI/ML Engineer at Carelon Global Solutions (Elevance Health) and an AWS Community Builder. She specializes in Agentic AI, LangGraph-based multi-agent systems, and MLOps for healthcare and insurance domains._
-
----
-
-**Tags:** `#AWSCommunityBuilder` `#LangGraph` `#AgenticAI` `#AWSLambda` `#InsurTech` `#GenerativeAI` `#MLOps` `#AmazonS3` `#DynamoDB` `#HealthcareAI`
-
----
-
 **GitHub:** [AWS Powered Insurance Policy Exclusion Management Agent](https://github.com/its-me-sweta/AWS_Powered_Insurance_Policy_Exclusion_Management_Agent)
