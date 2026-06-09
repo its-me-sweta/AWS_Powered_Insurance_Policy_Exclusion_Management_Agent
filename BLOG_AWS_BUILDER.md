@@ -1,8 +1,6 @@
 # Agent-Driven Exclusion Management in Insurance Using LangGraph + S3 + Lambda
 
-**Author:** Sweta Jha | Senior Data Scientist & AI/ML Engineer | AWS Community Builder  
-**Domain:** Healthcare Insurance | Agentic AI | MLOps  
-**Stack:** LangGraph · AWS Lambda · Amazon S3 · Amazon DynamoDB · Python
+_A technical deep-dive into building a fully agentic insurance policy exclusion management pipeline using LangGraph, AWS Lambda, Amazon S3, and DynamoDB — written for the AWS Skill Builder community._
 
 ---
 
@@ -199,7 +197,7 @@ Conflicting exclusions get tagged and routed to rejection during application. No
 ```python
 def application_node(state: AgentState) -> AgentState:
     conflict_ids = {c["incoming"] for c in state["conflicts"]}
-    
+
     for ex in state["exclusions"]:
         if ex["exclusion_id"] in conflict_ids:
             rejected.append(ex["exclusion_id"])
@@ -247,7 +245,7 @@ def lambda_handler(event, context):
         key = unquote_plus(record["s3"]["object"]["key"])
         parts = key.split("/")
         policy_id, member_id = parts[1], parts[2]
-        
+
         final_state = run_exclusion_pipeline(policy_id, member_id, key)
         # ... return summary
 ```
@@ -281,10 +279,38 @@ The Lambda execution role needs:
 {
   "Version": "2012-10-17",
   "Statement": [
-    { "Effect": "Allow", "Action": ["s3:GetObject", "s3:PutObject"], "Resource": "arn:aws:s3:::insurance-exclusion-pipeline/*" },
-    { "Effect": "Allow", "Action": ["dynamodb:PutItem", "dynamodb:GetItem", "dynamodb:UpdateItem", "dynamodb:Query"], "Resource": "arn:aws:dynamodb:*:*:table/exclusion-records*" },
-    { "Effect": "Allow", "Action": ["lambda:InvokeFunction"], "Resource": ["arn:aws:lambda:*:*:function:exclusion-notification-fn", "arn:aws:lambda:*:*:function:exclusion-audit-fn"] },
-    { "Effect": "Allow", "Action": ["logs:CreateLogGroup", "logs:CreateLogStream", "logs:PutLogEvents"], "Resource": "arn:aws:logs:*:*:*" }
+    {
+      "Effect": "Allow",
+      "Action": ["s3:GetObject", "s3:PutObject"],
+      "Resource": "arn:aws:s3:::insurance-exclusion-pipeline/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:PutItem",
+        "dynamodb:GetItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:Query"
+      ],
+      "Resource": "arn:aws:dynamodb:*:*:table/exclusion-records*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["lambda:InvokeFunction"],
+      "Resource": [
+        "arn:aws:lambda:*:*:function:exclusion-notification-fn",
+        "arn:aws:lambda:*:*:function:exclusion-audit-fn"
+      ]
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "arn:aws:logs:*:*:*"
+    }
   ]
 }
 ```
@@ -308,6 +334,7 @@ def test_detects_conflict(self, mock_dynamo, base_state):
 Key testing principle: **every node is tested in pure isolation**. No real AWS calls in unit tests. The `S3Tool`, `DynamoDBTool`, and `LambdaTool` classes are mocked at the module level. For integration tests, use `moto` to spin up local AWS mock endpoints.
 
 Run the full suite:
+
 ```bash
 pip install -r requirements.txt
 pytest tests/ -v --tb=short
@@ -319,13 +346,13 @@ pytest tests/ -v --tb=short
 
 After deploying this pipeline in a pilot on 3,000 policy documents:
 
-| Metric | Before | After |
-|--------|--------|-------|
-| Manual review time per policy | ~12 min | ~0 min |
-| Exclusion extraction accuracy | ~87% (human) | ~94% (agent + validation) |
-| Conflict detection latency | 2–3 days | < 30 seconds |
-| Audit trail completeness | Partial (email chains) | 100% (structured DynamoDB) |
-| Processing throughput | ~200 policies/day | ~5,000 policies/day |
+| Metric                        | Before                 | After                      |
+| ----------------------------- | ---------------------- | -------------------------- |
+| Manual review time per policy | ~12 min                | ~0 min                     |
+| Exclusion extraction accuracy | ~87% (human)           | ~94% (agent + validation)  |
+| Conflict detection latency    | 2–3 days               | < 30 seconds               |
+| Audit trail completeness      | Partial (email chains) | 100% (structured DynamoDB) |
+| Processing throughput         | ~200 policies/day      | ~5,000 policies/day        |
 
 The biggest win wasn't speed — it was **audit completeness**. Every exclusion decision now has a timestamped, structured trail from document ingestion to DynamoDB write to notification. In a regulatory audit, this is the difference between a clean response and a painful evidence-gathering exercise.
 
@@ -378,8 +405,12 @@ For Lambda deployment, package the project with dependencies and configure the S
 
 ---
 
-*Sweta Jha is a Senior Data Scientist and AI/ML Engineer at Carelon Global Solutions (Elevance Health) and an AWS Community Builder. She specializes in Agentic AI, LangGraph-based multi-agent systems, and MLOps for healthcare and insurance domains.*
+_Sweta Jha is a Senior Data Scientist and AI/ML Engineer at Carelon Global Solutions (Elevance Health) and an AWS Community Builder. She specializes in Agentic AI, LangGraph-based multi-agent systems, and MLOps for healthcare and insurance domains._
 
 ---
 
 **Tags:** `#AWSCommunityBuilder` `#LangGraph` `#AgenticAI` `#AWSLambda` `#InsurTech` `#GenerativeAI` `#MLOps` `#AmazonS3` `#DynamoDB` `#HealthcareAI`
+
+---
+
+**GitHub:** [AWS Powered Insurance Policy Exclusion Management Agent](https://github.com/its-me-sweta/AWS_Powered_Insurance_Policy_Exclusion_Management_Agent)
